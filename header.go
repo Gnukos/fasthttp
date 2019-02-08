@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"sync/atomic"
 	"time"
 )
 
@@ -1435,23 +1434,6 @@ func isOnlyCRLF(b []byte) bool {
 	return true
 }
 
-func init() {
-	refreshServerDate()
-	go func() {
-		for {
-			time.Sleep(time.Second)
-			refreshServerDate()
-		}
-	}()
-}
-
-var serverDate atomic.Value
-
-func refreshServerDate() {
-	b := AppendHTTPDate(nil, time.Now())
-	serverDate.Store(b)
-}
-
 // Write writes response header to w.
 func (h *ResponseHeader) Write(w *bufio.Writer) error {
 	_, err := w.Write(h.Header())
@@ -1492,7 +1474,6 @@ func (h *ResponseHeader) AppendBytes(dst []byte) []byte {
 	if len(server) != 0 {
 		dst = appendHeaderLine(dst, strServer, server)
 	}
-	dst = appendHeaderLine(dst, strDate, serverDate.Load().([]byte))
 
 	// Append Content-Type only for non-zero responses
 	// or if it is explicitly set.

@@ -2396,12 +2396,11 @@ func (s *Server) writeFastError(w io.Writer, statusCode int, msg string) {
 
 	fmt.Fprintf(w, "Connection: close\r\n"+
 		server+
-		"Date: %s\r\n"+
 		"Content-Type: text/plain\r\n"+
 		"Content-Length: %d\r\n"+
 		"\r\n"+
 		"%s",
-		serverDate.Load(), len(msg), msg)
+		len(msg), msg)
 }
 
 func defaultErrorHandler(ctx *RequestCtx, err error) {
